@@ -1,3 +1,9 @@
+#
+# UDP Client 
+# no terminal: python3 udpclient.py
+# Rode ele depois de iniciar em outro terminal o Servidor
+#
+
 import socket
 
 # Variáveis

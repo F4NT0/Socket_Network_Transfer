@@ -1,3 +1,9 @@
+#
+# UDP Server
+# no terminal: python3 udpserver.py
+# Rode ele primeiro em um terminal separado
+#
+
 import socket
 
 # Variáveis
