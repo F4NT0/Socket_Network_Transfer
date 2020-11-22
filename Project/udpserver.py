@@ -24,16 +24,27 @@ UDPServerSocket.bind((serverIP,localPort))
 print("UDP Server UP and LISTEN!")
 
 # Esperando por qualquer Datagram para o Servidor
-while(True):
+try:
+    while(True):
+        # Recebendo mensagem do Cliente
+        bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
+        message = bytesAddressPair[0].decode('utf-16')
+        address = bytesAddressPair[1]
 
-    # Recebendo mensagem do Cliente
-    bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
-    message = bytesAddressPair[0]
-    address = bytesAddressPair[1]
+        # Apresentação da Mensagem
+        print("Mensagem do Cliente: {}".format(message))
+        print("IP do Cliente: {}".format(address))
 
-    # Apresentação da Mensagem
-    print("Mensagem do Cliente: {}".format(message))
-    print("IP do Cliente: {}".format(address))
+        # Enviando resposta ao Cliente
+        UDPServerSocket.sendto(bytesToSend,address)
+except Exception as e:
+    print("\n========================")
+    print("Server exception ocurred")
+    print(e)
+    print("========================")
+finally:
+    UDPServerSocket.close()
+    print("\n========================")
+    print("     Server closed")
+    print("========================")
 
-    # Enviando resposta ao Cliente
-    UDPServerSocket.sendto(bytesToSend,address)
