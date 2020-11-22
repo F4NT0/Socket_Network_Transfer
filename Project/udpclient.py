@@ -8,10 +8,10 @@ import socket
 
 # Variáveis
 file = open("book.txt", "r", encoding='utf-8', errors="strict")
-stringOfFile = file.read().encode("utf-16", errors="replace")
+encodedStr = file.read().encode("utf-16", errors="replace")
 serverAddressPort = ("127.0.0.1", 8184)
 bufferSize = 1024
-packages = [stringOfFile[i:i+bufferSize] for i in range (0, len(stringOfFile), bufferSize)]
+packages = [encodedStr[i:i+bufferSize] for i in range (0, len(encodedStr), bufferSize)]
 
 # Criando Socket UDP do cliente
 UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
@@ -19,7 +19,10 @@ UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 # Enviando mensagem ao Servidor
 for package in packages:
     UDPClientSocket.sendto(package,serverAddressPort)
+    # Pegando mensagem do Servidor
+    msgFromServer = UDPClientSocket.recvfrom(bufferSize)
+    print("Mensagem do Servidor: {}".format(msgFromServer[0]))
 
-# Pegando mensagem do Servidor
-msgFromServer = UDPClientSocket.recvfrom(bufferSize)
-print("Mensagem do Servidor: {}".format(msgFromServer[0]))
+
+
+file.close()

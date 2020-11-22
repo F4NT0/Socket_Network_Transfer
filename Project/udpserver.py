@@ -21,7 +21,7 @@ UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 UDPServerSocket.bind((serverIP,localPort))
 
 # Mensagem mostrando que está ativo
-print("UDP Server UP and LISTEN!")
+print("UDP Server UP and LISTENING!")
 
 # Esperando por qualquer Datagram para o Servidor
 try:
