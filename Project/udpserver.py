@@ -37,10 +37,10 @@ try:
 
         # Enviando resposta ao Cliente
         UDPServerSocket.sendto(bytesToSend,address)
-except Exception as e:
+except Exception as socketException:
     print("\n========================")
     print("Server exception ocurred")
-    print(e)
+    print(socketException)
     print("========================")
 finally:
     UDPServerSocket.close()
