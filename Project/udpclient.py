@@ -8,13 +8,13 @@ import socket
 import time
 import random
 
-from Project.auxiliar import formatUDP
+from auxiliar import formatUDP
 
 # Variáveis
 file = open("book.txt", "r", encoding='utf-8', errors="strict")
-encodedStr = file.read(1020).encode("utf-16", errors="replace")
+encodedStr = file.read().encode("utf-16", errors="replace")
 serverAddressPort = ("127.0.0.1", 8184)
-bufferSize = 1020
+bufferSize = 1014
 packages = [encodedStr[i:i+bufferSize] for i in range (0, len(encodedStr), bufferSize)]
 
 # Variáveis para mandar pacotes
@@ -33,7 +33,7 @@ initialTime = time.time()
 UDPClientSocket.sendto(
     "0000Loremipsumdolorsitamet,consecteturadipiscingelit".encode("utf-16"),
     serverAddressPort)
-UDPClientSocket.recvfrom(bufferSize)
+
 roundTripTime = time.time() - initialTime # 0.001 segundos
 roundTripTime = 0.001 if roundTripTime==0 else roundTripTime
 print("Round-Trip-Time: {}".format(roundTripTime))
@@ -44,16 +44,36 @@ def slowStart():
     global cwnd, index
     while cwnd < threshold:
         for i in range(cwnd):
+            if index >= len(packages): 
+                break
             UDPClientSocket.sendto(
                 formatUDP(True, index, packages[index]),
                 serverAddressPort)
+            UDPClientSocket.recvfrom(bufferSize)
             index += 1
         cwnd += cwnd
     print("Reached threshold!" if (cwnd>=threshold) else "Ended streaming!")
 
+# Algoritmo Congestion Avoidance
+def congestionAvoidance():
+    global cwnd, index
+    while cwnd >= threshold and index < len(packages):
+        UDPClientSocket.sendto(
+            formatUDP(True, index, packages[index]),
+            serverAddressPort)
+        UDPClientSocket.recvfrom(bufferSize)
+        index += 1
+        cwnd += 1
 
+# 
+while index < len(packages):
+    if cwnd < threshold:
+        print("Slow start")
+        slowStart()
+    else:
+        print("Congestion Avoidance")
+        congestionAvoidance()
 
-# Enviando mensagem ao Servidor
 
 
 file.close()
