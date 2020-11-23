@@ -5,10 +5,12 @@
 #
 
 import socket
+import time
+import random
 
 # Variáveis
 file = open("book.txt", "r", encoding='utf-8', errors="strict")
-encodedStr = file.read().encode("utf-16", errors="replace")
+encodedStr = file.read(100).encode("utf-16", errors="replace")
 serverAddressPort = ("127.0.0.1", 8184)
 bufferSize = 1024
 packages = [encodedStr[i:i+bufferSize] for i in range (0, len(encodedStr), bufferSize)]
@@ -23,22 +25,27 @@ roundTripTime = -1
 # Criando Socket UDP do cliente
 UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
+# Funções auxiliares de formatação do cabeçalho
+def formatUDP(segmentation, message):
+    return "{:04d}".format(int(segmentation)).encode("utf-16") + message
+
+# Verificando RTT
+initialTime = time.time()
+UDPClientSocket.sendto(
+    "0000Loremipsumdolorsitamet,consecteturadipiscingelit".encode("utf-16"),
+    serverAddressPort)
+UDPClientSocket.recvfrom(bufferSize)
+roundTripTime = time.time() - initialTime # 0.001 segundos
+roundTripTime = 0.001 if roundTripTime==0 else roundTripTime
+print("Round-Trip-Time: {}".format(roundTripTime))
+
+
 def slowStart():
     global cwnd
-    print("Starting slow start...")
-    index = 0
     while cwnd < threshold:
-        print("cwnd: " + cwnd)
-        for aux in range(cwnd):
-            UDPClientSocket.sendto(packages[index],serverAddressPort)
-            index += 1
-        socket.listen(cwnd)
-        try:
-            for i in range(cwnd):
-                if socket.accept() == 0: raise Exception()
-            cwnd += cwnd
-        except:
-            cwnd = 1
+        for index in range(cwnd):
+            UDPClientSocket.sendto()
+    initialTime = time.time()
 
     print("Reached threshold!" if (cwnd>=threshold) else "Ended streaming!")
 
