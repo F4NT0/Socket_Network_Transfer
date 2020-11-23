@@ -227,3 +227,25 @@ for package in packages:
 ```
 
 Dessa forma temos como ver se o pacote foi enviado e se o Servidor recebeu esse pacote.
+
+---
+
+## Verificando no Wireshark
+
+Podemos ver os envios TCP pelo Wireshark, onde são divididos em fragmentos cada vez que ele envia, onde as partes do envio aparecem assim no Wireshark:
+
+<img src="../Images/wireshark1.png">
+
+Dai quando o Servidor responde para o cliente ele junta os fragmentos na resposta, como mostra a imagem abaixo:
+
+<img src="../Images/wireshark2.png">
+
+Quando o Cliente envia uma mensagem, é feito um Client Hello, onde possui um Header com um tamanho específico, que no teste específico possui 32 bytes
+
+<img src="../Images/wireshark3.png">
+
+---
+
+## Repositório Original
+
+O Link para o Repositório Original onde esse projeto foi trabalhado é **https://github.com/F4NT0/Socket_Network_Transfer**
