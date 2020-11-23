@@ -18,6 +18,7 @@ Esse projeto foi desenvolvido como Trabalho final de Laboratório de Redes e Red
 
 ## Compilação
 
+* No terminal: rode o programa `python3 fileManager.py` e selecione o arquivo do computador que deseja pegar, onde vai ser salvo no arquivo **file.txt**
 * No Computador Servidor: `python3 udpserver.py`
 * No Computador Cliente: `python3 udpclient.py`
 
