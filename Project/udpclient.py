@@ -14,15 +14,15 @@ from auxiliar import formatUDP
 file = open("book.txt", "r", encoding='utf-8', errors="strict")
 encodedStr = file.read().encode("utf-16", errors="replace")
 serverAddressPort = ("127.0.0.1", 8184)
-bufferSize = 1014
+bufferSize = 300
 packages = [encodedStr[i:i+bufferSize] for i in range (0, len(encodedStr), bufferSize)]
 
 # Variáveis para mandar pacotes
-cwnd = 1
+cwnd = 1 # congestion avoidance
 threshold = 64
 mtu = 1500
-mss = mtu - 40
-roundTripTime = -1
+mss = mtu - 40 # maximum segment size
+roundTripTime = -1 #rtt
 index = 0
 
 # Criando Socket UDP do cliente
@@ -33,11 +33,10 @@ initialTime = time.time()
 UDPClientSocket.sendto(
     "0000Loremipsumdolorsitamet,consecteturadipiscingelit".encode("utf-16"),
     serverAddressPort)
-
+UDPClientSocket.recvfrom(bufferSize)
 roundTripTime = time.time() - initialTime # 0.001 segundos
 roundTripTime = 0.001 if roundTripTime==0 else roundTripTime
 print("Round-Trip-Time: {}".format(roundTripTime))
-
 
 # Algoritmo de Slow Start
 def slowStart():
