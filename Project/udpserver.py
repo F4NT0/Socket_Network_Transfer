@@ -5,13 +5,14 @@
 #
 
 import socket
+from time import sleep
 
 # Variáveis
 
-serverIP = "127.0.0.1" # Este IP muda para cada computador
+serverIP = "127.0.0.1"
 localPort = 8184
-bufferSize = 1024
-msgFromServer = "Hello from UDP Server"
+bufferSize = 300
+msgFromServer = "Mensagem Encaminhada"
 bytesToSend = str.encode(msgFromServer)
 
 # Criando um Datagram Socket
@@ -38,9 +39,14 @@ try:
 
         # Apresentação da Mensagem
         print("Mensagem do Cliente: {}".format(message))
-        print("IP do Cliente: {}".format(address))
-        print("Segment: {}".format(segment))
-        print("============================")
+        print("IP e Porta do Cliente: {}".format(address))
+        print("\n\n")
+        sleep(1)
+
+        # Guardando os dados em um novo arquivo
+        f = open("fileCopied.txt","a")
+        f.write(message)
+        f.close()
 
         # Enviando resposta ao Cliente
         UDPServerSocket.sendto(bytesToSend,address)

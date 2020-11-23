@@ -11,7 +11,7 @@ import random
 from auxiliar import formatUDP
 
 # Variáveis
-file = open("book.txt", "r", encoding='utf-8', errors="strict")
+file = open("file.txt", "r", encoding='utf-8', errors="strict")
 encodedStr = file.read().encode("utf-16", errors="replace")
 serverAddressPort = ("127.0.0.1", 8184)
 bufferSize = 300

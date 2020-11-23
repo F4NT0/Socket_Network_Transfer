@@ -5,12 +5,14 @@
 
 from tkinter import *
 from tkinter import filedialog
+from shutil import copyfile
 
 # Tela do File Manager
 def browseFile():
     filename = filedialog.askopenfilename(initialdir = "/",title = "Selecione um Arquivo",filetypes=[("Tipo de Arquivo","*.txt")])
     # Alterar o conteudo
     label_file.configure(text = "Arquivo Aberto: " + filename)
+    copyfile(filename,"./file.txt")
 
 # Criando uma Tela Inicial
 window = Tk()
