@@ -34,7 +34,7 @@ try:
 
         # Apresentação da Mensagem
         print("Mensagem do Cliente: {}".format(message))
-        print("IP do Cliente: {}".format(address))
+        print("IP e Porta do Cliente: {}".format(address))
         print("\n\n")
         sleep(1)
 
