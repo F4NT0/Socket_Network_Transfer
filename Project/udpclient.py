@@ -2,7 +2,7 @@
 # UDP Client 
 # no terminal: python3 udpclient.py
 # Rode ele depois de iniciar em outro terminal o Servidor
-#
+# python .\udpclient.py
 
 import socket
 import time
@@ -11,11 +11,12 @@ import random
 from auxiliar import formatUDP
 
 # Variáveis
-file = open("file.txt", "r", encoding='utf-8', errors="strict")
+file = open("file.txt", "r", encoding='utf-8-sig', errors="strict")
 encodedStr = file.read().encode("utf-16", errors="replace")
 serverAddressPort = ("127.0.0.1", 8184)
-bufferSize = 300
+bufferSize = 290
 packages = [encodedStr[i:i+bufferSize] for i in range (0, len(encodedStr), bufferSize)]
+
 
 # Variáveis para mandar pacotes
 cwnd = 1 # congestion avoidance
@@ -37,6 +38,8 @@ UDPClientSocket.recvfrom(bufferSize)
 roundTripTime = time.time() - initialTime # 0.001 segundos
 roundTripTime = 0.001 if roundTripTime==0 else roundTripTime
 print("Round-Trip-Time: {}".format(roundTripTime))
+
+
 
 # Algoritmo de Slow Start
 def slowStart():

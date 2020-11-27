@@ -1,5 +1,8 @@
 import time
 
+# cd Desktop/LabRedes/TF/Socket_Network_Transfer/Project
+# python .\udpclient.py
+
 # Converte um número em seu hexadecimal
 def hexa(decimal):
     return hex(decimal)[2:].zfill(3)

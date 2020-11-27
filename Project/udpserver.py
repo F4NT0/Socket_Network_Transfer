@@ -38,13 +38,14 @@ try:
         message = input[4:]
 
         # Apresentação da Mensagem
-        print("Mensagem do Cliente: {}".format(message))
         print("IP e Porta do Cliente: {}".format(address))
+        print("Fragment: {}".format(segment))
+        print("Mensagem do Cliente: {}".format(message))
         print("\n\n")
         sleep(1)
 
         # Guardando os dados em um novo arquivo
-        f = open("fileCopied.txt","a")
+        f = open("fileCopied.txt", "a", encoding="utf-8-sig")
         f.write(message)
         f.close()
 
