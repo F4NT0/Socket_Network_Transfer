@@ -31,10 +31,10 @@ UDPClientSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
 # Verificando RTT
 initialTime = time.time()
-UDPClientSocket.sendto(
-    "0000Loremipsumdolorsitamet,consecteturadipiscingelit".encode("utf-16"),
-    serverAddressPort)
-UDPClientSocket.recvfrom(bufferSize)
+# UDPClientSocket.sendto(
+#     "0000Loremipsumdolorsitamet,consecteturadipiscingelit".encode("utf-16"),
+#     serverAddressPort)
+# UDPClientSocket.recvfrom(bufferSize)
 roundTripTime = time.time() - initialTime # 0.001 segundos
 roundTripTime = 0.001 if roundTripTime==0 else roundTripTime
 print("Round-Trip-Time: {}".format(roundTripTime))
@@ -44,7 +44,7 @@ print("Round-Trip-Time: {}".format(roundTripTime))
 # Algoritmo de Slow Start
 def slowStart():
     global cwnd, index
-    while cwnd < threshold:
+    while cwnd < threshold and index < len(packages):
         for i in range(cwnd):
             if index >= len(packages): 
                 break
