@@ -39,7 +39,12 @@ roundTripTime = time.time() - initialTime # 0.001 segundos
 roundTripTime = 0.001 if roundTripTime==0 else roundTripTime
 print("Round-Trip-Time: {}".format(roundTripTime))
 
-
+# Algoritmo que maneja enviar e receber pacotes
+receivedAcks = []
+def sendPackage(message):
+    global receivedAcks
+    UDPClientSocket.sendto(message, serverAddressPort)
+    receivedAcks.append(UDPClientSocket.recvfrom(bufferSize).decode("utf-16"))
 
 # Algoritmo de Slow Start
 def slowStart():
@@ -51,7 +56,7 @@ def slowStart():
             UDPClientSocket.sendto(
                 formatUDP(True, index, packages[index]),
                 serverAddressPort)
-            UDPClientSocket.recvfrom(bufferSize)
+            receivedAcks.append(UDPClientSocket.recvfrom(bufferSize)[0].decode("utf-16"))
             index += 1
         cwnd += cwnd
     print("Reached threshold!" if (cwnd>=threshold) else "Ended streaming!")
