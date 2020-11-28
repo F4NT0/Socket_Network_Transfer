@@ -42,27 +42,31 @@ print("Round-Trip-Time: {}".format(roundTripTime))
 # Algoritmo que maneja enviar e receber pacotes
 receivedAcks = []
 def sendPackage(message):
-    global receivedAcks
     UDPClientSocket.sendto(message, serverAddressPort)
     responseIndex = deca(UDPClientSocket.recvfrom(bufferSize)[0].decode("utf-16"))
-    receivedAcks.append(responseIndex)
+    return responseIndex
+
+def verify():
+    pass
 
 # Algoritmo de Slow Start
 def slowStart():
     global cwnd, index, receivedAcks
     while cwnd < threshold and index < len(packages):
         print("\nStarting new Slow Start loop. Pacotes restantes: {}".format(len(packages)-index))
+        newAcks = []
         for i in range(cwnd):
             if index >= len(packages): 
                 break
             print("Sending package {}/{}".format(i+1, cwnd))
-            sendPackage(formatUDP(True, index, packages[index]))
+            newAcks.append(sendPackage(formatUDP(True, index, packages[index])))
             index += 1
-        # TODO: VERIFICAR SE PACOTES ADICIONADOS NO ARRAY RECEIVED ACKS
-        # ESTÃO CORRETOS, SEM FALTAR NENHUM
-        # SE SIM:
-        cwnd += cwnd
-        # SE NÃO cwnd = 1
+        receivedAcks = receivedAcks + newAcks
+        if len(newAcks) == cwnd:
+            cwnd += cwnd
+        else:
+            cwnd = 1
+        newAcks.clear
     print("Reached threshold!" if (cwnd>=threshold) else "Ended streaming!")
 
 # Algoritmo Congestion Avoidance
@@ -70,11 +74,15 @@ def congestionAvoidance():
     global cwnd, index, receivedAcks
     while cwnd >= threshold and index < len(packages):
         print("\nStarting new Congestion Avoidance loop. Pacotes restantes: {}".format(len(packages)-index))
+        newAcks = []
         for i in range(cwnd):
             print("Sending package {}/{}".format(i+1, cwnd))
-            sendPackage(formatUDP(True, index, packages[index]))
+            newAcks.append(sendPackage(formatUDP(True, index, packages[index])))
             index += 1
-        cwnd += 1
+        if len(newAcks) == cwnd:
+            cwnd += 1
+        else:
+            cwnd /= 2
 
 # 
 while index < len(packages):

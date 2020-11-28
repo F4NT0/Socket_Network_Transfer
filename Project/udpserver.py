@@ -13,11 +13,6 @@ serverIP = "127.0.0.1"
 localPort = 8184
 bufferSize = 300
 
-# Deleta conteúdo do arquivo a ser escrito
-f = open("fileCopied.txt", "w", encoding="utf-8-sig")
-f.write("")
-f.close()
-
 # Criando um Datagram Socket
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
@@ -50,6 +45,10 @@ try:
         # Verifica se a mensagem é única ou se outras irão vir
         if segment[0] == '0':
             print("Message:\t{}".format(message))
+            # Deleta conteúdo do arquivo a ser escrito
+            f = open("fileCopied.txt", "w", encoding="utf-8-sig")
+            f.write("")
+            f.close()
         else:
             print("Fragment with index: {}".format(deca(segment[1:])))
             print("Fragment size: {}".format(len(message)))
