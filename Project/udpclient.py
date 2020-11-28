@@ -58,8 +58,9 @@ def slowStart():
         for i in range(cwnd):
             if index >= len(packages): 
                 break
-            print("Sending package {}/{}".format(i+1, cwnd))
-            newAcks.append(sendPackage(formatUDP(True, index, packages[index])))
+            ack = sendPackage(formatUDP(True, index, packages[index]))
+            print("Sending package {}/{}, ack: {}".format(i+1, cwnd, ack))
+            newAcks.append(ack)
             index += 1
         receivedAcks = receivedAcks + newAcks
         if len(newAcks) == cwnd:

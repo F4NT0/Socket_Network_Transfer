@@ -64,7 +64,8 @@ try:
         sleep(0.5)
 
         # Enviando resposta ao Cliente
-        UDPServerSocket.sendto( segment[1:].encode("utf-16"),address)
+        expecting = hexa(deca(segment[1:])+1)
+        UDPServerSocket.sendto( expecting.encode("utf-16"),address)
 
 except Exception as socketException:
     print("\n========================")
