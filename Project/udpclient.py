@@ -8,7 +8,7 @@ import socket
 import time
 import random
 
-from auxiliar import formatUDP
+from auxiliar import formatUDP, deca
 
 # Variáveis
 file = open("file.txt", "r", encoding='utf-8-sig', errors="strict")
@@ -44,32 +44,36 @@ receivedAcks = []
 def sendPackage(message):
     global receivedAcks
     UDPClientSocket.sendto(message, serverAddressPort)
-    receivedAcks.append(UDPClientSocket.recvfrom(bufferSize).decode("utf-16"))
+    responseIndex = deca(UDPClientSocket.recvfrom(bufferSize)[0].decode("utf-16"))
+    receivedAcks.append(responseIndex)
 
 # Algoritmo de Slow Start
 def slowStart():
-    global cwnd, index
+    global cwnd, index, receivedAcks
     while cwnd < threshold and index < len(packages):
+        print("\nStarting new Slow Start loop. Pacotes restantes: {}".format(len(packages)-index))
         for i in range(cwnd):
             if index >= len(packages): 
                 break
-            UDPClientSocket.sendto(
-                formatUDP(True, index, packages[index]),
-                serverAddressPort)
-            receivedAcks.append(UDPClientSocket.recvfrom(bufferSize)[0].decode("utf-16"))
+            print("Sending package {}/{}".format(i+1, cwnd))
+            sendPackage(formatUDP(True, index, packages[index]))
             index += 1
+        # TODO: VERIFICAR SE PACOTES ADICIONADOS NO ARRAY RECEIVED ACKS
+        # ESTÃO CORRETOS, SEM FALTAR NENHUM
+        # SE SIM:
         cwnd += cwnd
+        # SE NÃO cwnd = 1
     print("Reached threshold!" if (cwnd>=threshold) else "Ended streaming!")
 
 # Algoritmo Congestion Avoidance
 def congestionAvoidance():
-    global cwnd, index
+    global cwnd, index, receivedAcks
     while cwnd >= threshold and index < len(packages):
-        UDPClientSocket.sendto(
-            formatUDP(True, index, packages[index]),
-            serverAddressPort)
-        UDPClientSocket.recvfrom(bufferSize)
-        index += 1
+        print("\nStarting new Congestion Avoidance loop. Pacotes restantes: {}".format(len(packages)-index))
+        for i in range(cwnd):
+            print("Sending package {}/{}".format(i+1, cwnd))
+            sendPackage(formatUDP(True, index, packages[index]))
+            index += 1
         cwnd += 1
 
 # 

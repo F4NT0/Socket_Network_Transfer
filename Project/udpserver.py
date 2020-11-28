@@ -46,18 +46,20 @@ try:
         # Apresentação da Mensagem
         print("Recebido pacote{} do cliente.".format(" único" if segment[0] == '0' else ""))
         print("IP: {}, porta: {}".format(address[0], address[1]))
+
+        # Verifica se a mensagem é única ou se outras irão vir
         if segment[0] == '0':
             print("Message:\t{}".format(message))
         else:
             print("Fragment with index: {}".format(deca(segment[1:])))
             print("Fragment size: {}".format(len(message)))
 
-            # Guardando os dados em um novo arquivo
+            # Guardando os dados em um arquivo
             f = open("fileCopied.txt", "a", encoding="utf-8-sig")
             f.write(message)
             f.close()
 
-            print("Package content was successfully written into log file.")
+            print("Conteúdo do pacote foi adicionado com sucesso no arquivo fileCopied.txt")
         
         print("")
         sleep(0.5)
