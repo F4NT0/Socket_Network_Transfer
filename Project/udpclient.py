@@ -49,16 +49,23 @@ def sendPackage(message):
 def verify(receivedAcks):
     notReceivedPackages = []
     # PARA SIMULAR A PERDA DE PACOTES
-    # if len(receivedAcks)  > 5:
-    #     del receivedAcks[2]
+    if len(receivedAcks)  > 5:
+        del receivedAcks[2]
     for i in range(1, len(receivedAcks)):
         if i not in receivedAcks:
             notReceivedPackages = notReceivedPackages + [i]
     return notReceivedPackages
 
-def fastRetransmit(failedPackaged): 
-    print("\n Fast Retrasnmit to packages {}".format(failedPackaged))
-    # print("\n Fast Retrasnmit to packages: {}".format(packages))
+def fastRetransmit(failedPackages): 
+    restoredPackages = []
+    for i in range(len(failedPackages)):
+        receivedAcks = sendPackage(formatUDP(True, failedPackages[i], packages[failedPackages[i]])) - 1
+        if failedPackages[i] is receivedAcks:
+            restoredPackages += [receivedAcks]
+    for i in range(len(restoredPackages)):
+        if restoredPackages[i] in failedPackages:
+            failedPackages.remove(restoredPackages[i])
+    return failedPackages
 
 # Algoritmo de Slow Start
 def slowStart():
@@ -76,8 +83,8 @@ def slowStart():
             index += 1
         receivedAcks = receivedAcks + newAcks
         failedAcks = verify(receivedAcks)
-        if len(failedAcks) > 0:
-            fastRetransmit(failedAcks)
+        while len(failedAcks) > 0:
+            failedAcks = fastRetransmit(failedAcks)
         if len(newAcks) == cwnd:
             cwnd += cwnd
         else:
