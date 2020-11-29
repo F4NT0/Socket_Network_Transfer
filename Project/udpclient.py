@@ -46,8 +46,19 @@ def sendPackage(message):
     responseIndex = deca(UDPClientSocket.recvfrom(bufferSize)[0].decode("utf-16"))
     return responseIndex
 
-def verify():
-    pass
+def verify(receivedAcks):
+    notReceivedPackages = []
+    # PARA SIMULAR A PERDA DE PACOTES
+    # if len(receivedAcks)  > 5:
+    #     del receivedAcks[2]
+    for i in range(1, len(receivedAcks)):
+        if i not in receivedAcks:
+            notReceivedPackages = notReceivedPackages + [i]
+    return notReceivedPackages
+
+def fastRetransmit(failedPackaged): 
+    print("\n Fast Retrasnmit to packages {}".format(failedPackaged))
+    # print("\n Fast Retrasnmit to packages: {}".format(packages))
 
 # Algoritmo de Slow Start
 def slowStart():
@@ -58,11 +69,15 @@ def slowStart():
         for i in range(cwnd):
             if index >= len(packages): 
                 break
-            ack = sendPackage(formatUDP(True, index, packages[index]))
+            message = formatUDP(True, index, packages[index])
+            ack = sendPackage(message)
             print("Sending package {}/{}, ack: {}".format(i+1, cwnd, ack))
             newAcks.append(ack)
             index += 1
         receivedAcks = receivedAcks + newAcks
+        failedAcks = verify(receivedAcks)
+        if len(failedAcks) > 0:
+            fastRetransmit(failedAcks)
         if len(newAcks) == cwnd:
             cwnd += cwnd
         else:
