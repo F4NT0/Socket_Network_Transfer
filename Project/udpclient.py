@@ -49,7 +49,7 @@ def sendPackage(message):
 def verify(receivedAcks):
     notReceivedPackages = []
     # PARA SIMULAR A PERDA DE PACOTES
-    # if len(receivedAcks)  > 5:
+    # if len(receivedAcks) > 5:
     #     del receivedAcks[2]
     for i in range(1, len(receivedAcks)):
         if i not in receivedAcks:
@@ -60,7 +60,7 @@ def fastRetransmit(failedPackages):
     restoredPackages = []
     for i in range(len(failedPackages)):
         sendPackage(formatUDP(True, failedPackages[i], packages[failedPackages[i]]))
-        restoredPackages += failedPackages[i]
+        restoredPackages.append(failedPackages[i])
     for i in range(len(restoredPackages)):
         if restoredPackages[i] in failedPackages:
             failedPackages.remove(restoredPackages[i])
