@@ -49,8 +49,8 @@ def sendPackage(message):
 def verify(receivedAcks):
     notReceivedPackages = []
     # PARA SIMULAR A PERDA DE PACOTES
-    if len(receivedAcks)  > 5:
-        del receivedAcks[2]
+    # if len(receivedAcks)  > 5:
+    #     del receivedAcks[2]
     for i in range(1, len(receivedAcks)):
         if i not in receivedAcks:
             notReceivedPackages = notReceivedPackages + [i]
@@ -59,9 +59,8 @@ def verify(receivedAcks):
 def fastRetransmit(failedPackages): 
     restoredPackages = []
     for i in range(len(failedPackages)):
-        receivedAcks = sendPackage(formatUDP(True, failedPackages[i], packages[failedPackages[i]])) - 1
-        if failedPackages[i] is receivedAcks:
-            restoredPackages += [receivedAcks]
+        sendPackage(formatUDP(True, failedPackages[i], packages[failedPackages[i]]))
+        restoredPackages += failedPackages[i]
     for i in range(len(restoredPackages)):
         if restoredPackages[i] in failedPackages:
             failedPackages.remove(restoredPackages[i])
@@ -102,6 +101,9 @@ def congestionAvoidance():
             print("Sending package {}/{}".format(i+1, cwnd))
             newAcks.append(sendPackage(formatUDP(True, index, packages[index])))
             index += 1
+        failedAcks = verify(receivedAcks)
+        while len(failedAcks) > 0:
+            failedAcks = fastRetransmit(failedAcks)
         if len(newAcks) == cwnd:
             cwnd += 1
         else:
