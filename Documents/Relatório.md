@@ -246,6 +246,119 @@ Quando o Cliente envia uma mensagem, é feito um Client Hello, onde possui um He
 
 ---
 
+## Enviando um Arquivo e lidando com ele
+
+Após utilizarmos o arquivo **fileManager.py** para pegarmos o arquivo externo e salvarmos ele no arquivo **file.txt**, iremos utilizar esse arquivo para enviarmos do cliente para o Servidor para podermos construir um novo arquivo chamado **fileCopied.txt**.
+
+Inicializamos o **udpserver.py** em um Terminal, onde ele estará rodando na porta 8184, onde todos os clientes devem ser conectados com ele.
+
+Depois inicializamos o **udpclient.py** em outro Terminal, onde ele vai pegar o arquivo **file.txt**, ler ele e enviar para o servidor, onde cada vez que um cliente é iniciado é uma porta diferente, não sendo a mesma porta do Servidor.
+
+Para esse envio foi desenvolvido 3 métodos que lidam com o envio do Arquivo, onde primeiro é iniciado o **Slow Start**, onde o código dele é o abaixo:
+
+```python
+# Algoritmo de Slow Start
+def slowStart():
+    global cwnd, index, receivedAcks
+    while cwnd < threshold and index < len(packages):
+        print("\nStarting new Slow Start loop. Pacotes restantes: {}".format(len(packages)-index))
+        newAcks = []
+        for i in range(cwnd):
+            if index >= len(packages): 
+                break
+            message = formatUDP(True, index, packages[index])
+            ack = sendPackage(message)
+            print("Sending package {}/{}, ack: {}".format(i+1, cwnd, ack))
+            newAcks.append(ack)
+            index += 1
+        receivedAcks = receivedAcks + newAcks
+        failedAcks = verify(receivedAcks)
+        while len(failedAcks) > 0:
+            failedAcks = fastRetransmit(failedAcks)
+        if len(newAcks) == cwnd:
+            cwnd += cwnd
+        else:
+            cwnd = 1
+        newAcks.clear
+    print("Reached threshold!" if (cwnd>=threshold) else "Ended streaming!")
+```
+
+Quando chegar o limite(threshold) e o arquivo continuar, ele vai entrar no congestion avoidance, onde vai continuar a enviar o programa, onde o código do congestion avoidance é o seguinte:
+
+```python
+# Algoritmo Congestion Avoidance
+def congestionAvoidance():
+    global cwnd, index, receivedAcks
+    while cwnd >= threshold and index < len(packages):
+        print("\nStarting new Congestion Avoidance loop. Pacotes restantes: {}".format(len(packages)-index))
+        newAcks = []
+        for i in range(cwnd):
+            print("Sending package {}/{}".format(i+1, cwnd))
+            newAcks.append(sendPackage(formatUDP(True, index, packages[index])))
+            index += 1
+        failedAcks = verify(receivedAcks)
+        while len(failedAcks) > 0:
+            failedAcks = fastRetransmit(failedAcks)
+        if len(newAcks) == cwnd:
+            cwnd += 1
+        else:
+            cwnd /= 2
+```
+
+Em questão á perda de pacotes, criamos um Método chamado **verify()** onde verifica se os pacotes estão sendo enviados com sucesso, tem uma parte comentada que serve para testarmos a perda de pacotes, como mostra o código abaixo:
+
+```python
+def verify(receivedAcks):
+    notReceivedPackages = []
+    # PARA SIMULAR A PERDA DE PACOTES
+    # if len(receivedAcks) > 5:
+    #     del receivedAcks[2]
+    for i in range(1, len(receivedAcks)):
+        if i not in receivedAcks:
+            notReceivedPackages = notReceivedPackages + [i]
+    return notReceivedPackages
+```
+
+Se ocorrer a perda de pacotes ele vai reenviar, utilizando o método **fastRetransmit**, como mostra o código abaixo:
+
+```python
+def fastRetransmit(failedPackages): 
+    restoredPackages = []
+    for i in range(len(failedPackages)):
+        sendPackage(formatUDP(True, failedPackages[i], packages[failedPackages[i]]))
+        restoredPackages.append(failedPackages[i])
+    for i in range(len(restoredPackages)):
+        if restoredPackages[i] in failedPackages:
+            failedPackages.remove(restoredPackages[i])
+    return failedPackages
+```
+
+Um exemplo de perda de pacotes e reenvio:
+
+<img src="../Images/perda_pacote.png">
+
+Os _index_ mostram que os pacotes de index 5 foi perdido e depois foi reenviado de novo.
+
+Após lido o Arquivo e criado o novo Arquivo texto fileCopied.txt, podemos verificar se eles são iguais da seguinte forma:
+
+```shell
+# Verificar as hashes dos arquivos
+> md5sum file.txt fileCopied.txt > verification.txt
+```
+
+```shell
+# Verificar a integridade dos arquivos
+> md5sum --check verification.txt
+```
+
+E é esperado a seguinte resposta do terminal:
+
+<img src="../Images/verification.png">
+
+Com isso, significa que foi transmitido de forma correta o arquivo e está identico ao original
+
+---
+
 ## Repositório Original
 
 O Link para o Repositório Original onde esse projeto foi trabalhado é **https://github.com/F4NT0/Socket_Network_Transfer**
