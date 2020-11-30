@@ -98,6 +98,8 @@ def congestionAvoidance():
         print("\nStarting new Congestion Avoidance loop. Pacotes restantes: {}".format(len(packages)-index))
         newAcks = []
         for i in range(cwnd):
+            if index >= len(packages):
+                return
             print("Sending package {}/{}".format(i+1, cwnd))
             newAcks.append(sendPackage(formatUDP(True, index, packages[index])))
             index += 1
